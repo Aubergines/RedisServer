@@ -1,4 +1,4 @@
-package org.springframework.sandbox.netty;
+package com.zsq.netty;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;

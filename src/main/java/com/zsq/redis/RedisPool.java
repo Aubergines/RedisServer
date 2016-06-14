@@ -46,7 +46,7 @@ public final class RedisPool {
             JedisPoolConfig config = new JedisPoolConfig();
             config.setMaxIdle(MAX_IDLE);
             config.setTestOnBorrow(TEST_ON_BORROW);
-            jedisPool = new JedisPool(config, ADDR, PORT, TIMEOUT, AUTH,DATA_BASE);
+            jedisPool = new JedisPool(config, ADDR, PORT, TIMEOUT, AUTH, DATA_BASE);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -54,13 +54,12 @@ public final class RedisPool {
 
     /**
      * 获取Jedis实例
+     *
      * @return
      */
     public synchronized static JedisPool getJedis() {
         try {
             if (jedisPool != null) {
-//                Jedis resource = jedisPool.getResource();
-//                return resource;
                 return jedisPool;
             } else {
                 return null;
@@ -87,6 +86,7 @@ public final class RedisPool {
 
     /**
      * 释放jedis资源
+     *
      * @param jedis
      */
     public static void returnResource(final Jedis jedis) {

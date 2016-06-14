@@ -1,10 +1,10 @@
 2016-06-13 23:58:37.016 [main] INFO  o.s.w.c.s.AnnotationConfigWebApplicationContext - Refreshing Root WebApplicationContext: startup date [Mon Jun 13 23:58:37 CST 2016]; root of context hierarchy
-2016-06-13 23:58:37.349 [main] INFO  o.s.w.c.s.AnnotationConfigWebApplicationContext - Registering annotated classes: [class org.springframework.sandbox.netty.AppConfig]
+2016-06-13 23:58:37.349 [main] INFO  o.s.w.c.s.AnnotationConfigWebApplicationContext - Registering annotated classes: [class com.zsq.netty.AppConfig]
 2016-06-13 23:58:37.645 [main] INFO  o.s.beans.factory.xml.XmlBeanDefinitionReader - Loading XML bean definitions from URL [file:/E:/workspaces/RedisServer/target/classes/applicationContext.xml]
 2016-06-13 23:58:38.459 [main] INFO  o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Looking for @ControllerAdvice: Root WebApplicationContext: startup date [Mon Jun 13 23:58:37 CST 2016]; root of context hierarchy
-2016-06-13 23:58:38.565 [main] INFO  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped "{[/hello/getId],methods=[],params=[],headers=[],consumes=[],produces=[application/json;charset=utf-8],custom=[]}" onto public java.lang.String org.springframework.sandbox.mvc.TestController.getShopInJSON(javax.servlet.http.HttpServletRequest)
-2016-06-13 23:58:38.566 [main] INFO  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped "{[/hello/foo],methods=[],params=[],headers=[],consumes=[],produces=[application/json;charset=utf-8],custom=[]}" onto public java.lang.String org.springframework.sandbox.mvc.TestController.initCustomerData(javax.servlet.http.HttpServletRequest)
+2016-06-13 23:58:38.565 [main] INFO  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped "{[/hello/getId],methods=[],params=[],headers=[],consumes=[],produces=[application/json;charset=utf-8],custom=[]}" onto public java.lang.String com.zsq.business.TestController.getShopInJSON(javax.servlet.http.HttpServletRequest)
+2016-06-13 23:58:38.566 [main] INFO  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped "{[/hello/foo],methods=[],params=[],headers=[],consumes=[],produces=[application/json;charset=utf-8],custom=[]}" onto public java.lang.String com.zsq.business.TestController.initCustomerData(javax.servlet.http.HttpServletRequest)
 2016-06-13 23:58:38.629 [main] INFO  org.springframework.mock.web.MockServletContext - Initializing Spring FrameworkServlet ''
 2016-06-13 23:58:38.630 [main] INFO  org.springframework.web.servlet.DispatcherServlet - FrameworkServlet '': initialization started
 2016-06-13 23:58:38.676 [main] INFO  org.springframework.web.servlet.DispatcherServlet - FrameworkServlet '': initialization completed in 46 ms
-2016-06-13 23:58:38.677 [main] INFO  org.springframework.sandbox.netty.MyServer - Netty server has started on port : 8080
+2016-06-13 23:58:38.677 [main] INFO  com.zsq.netty.MyServer - Netty server has started on port : 8080
