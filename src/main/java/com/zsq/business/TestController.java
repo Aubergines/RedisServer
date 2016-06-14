@@ -7,7 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
+import redis.clients.jedis.ShardedJedis;
+import redis.clients.jedis.ShardedJedisPool;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
@@ -18,6 +21,8 @@ public class TestController {
     public static final String REST_SERVICE_URI = "http://localhost:8089/";
 
 
+    @Resource
+    ShardedJedisPool shardedJedisPool;
 
 
     @RequestMapping(value="/foo", produces = "application/json; charset=utf-8")
@@ -47,6 +52,14 @@ public class TestController {
         Object o = jsonObject.get("areasExpertise");
         System.out.println(o);
         return value;
+    }
+
+    @RequestMapping(value="/get", produces = "application/json; charset=utf-8")
+    public @ResponseBody String getJSON(HttpServletRequest request) {
+        ShardedJedis resource = shardedJedisPool.getResource();
+        String s = resource.get("key:__rand_int__");
+        System.out.println(s);
+        return "OK";
     }
 
 }
