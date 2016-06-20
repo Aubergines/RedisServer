@@ -84,13 +84,13 @@ public class TestController {
     public @ResponseBody String getKeywordJSON(HttpServletRequest request) {
         RestTemplate restTemplate = new RestTemplate();
         Map paramMap = new HashMap();
-        paramMap.put("firstResult", 0);
-        paramMap.put("visitSiteId", 6);
-        paramMap.put("isValid", 1);
-        paramMap.put("pageSize", 10);
-        paramMap.put("sortType", 1);
-        paramMap.put("pageIndex", 1);
-        paramMap.put("maxResult", 10);
+//        paramMap.put("firstResult", 0);
+//        paramMap.put("visitSiteId", 6);
+//        paramMap.put("isValid", 1);
+//        paramMap.put("pageSize", 10);
+//        paramMap.put("sortType", 1);
+//        paramMap.put("pageIndex", 1);
+//        paramMap.put("maxResult", 10);
         paramMap.put("searchParam", "关节");
         paramMap.put("treeLevel", "2_3");
         ResponseEntity forEntity = restTemplate.getForEntity(ALLINMD_SERVICE_URI + "comm/data/tag/v2/getMapList/", String.class, paramMap);
