@@ -1,4 +1,4 @@
-package org.springframework.sandbox.netty;
+package com.zsq.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.nio.NioEventLoopGroup;

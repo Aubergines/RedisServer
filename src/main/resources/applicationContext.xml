@@ -9,7 +9,7 @@
     http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- 自动扫描包 ,将带有注解的类 纳入spring容器管理 -->
-    <context:component-scan base-package="org.springframework.sandbox"/>
+    <context:component-scan base-package="com.zsq.business"/>
 
 
 </beans>

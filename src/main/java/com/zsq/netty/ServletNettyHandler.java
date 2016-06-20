@@ -1,4 +1,4 @@
-package org.springframework.sandbox.netty;
+package com.zsq.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

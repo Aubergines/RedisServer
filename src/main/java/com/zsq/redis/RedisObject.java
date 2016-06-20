@@ -20,4 +20,10 @@ public class RedisObject {
         RedisPool.returnResource(resource);
         return data;
     }
+
+    public static void deleteByKey(String key){
+        Jedis resource = RedisPool.getResource();
+        Long del = resource.del(key);
+        RedisPool.returnResource(resource);
+    }
 }
