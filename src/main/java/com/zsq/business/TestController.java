@@ -22,7 +22,7 @@ import java.util.Map;
 public class TestController {
 
 
-    public static final String REST_SERVICE_URI = "http://localhost:8089/";
+    public static final String REST_SERVICE_URI = "http://115.28.87.77:8089/";
     public static final String ALLINMD_SERVICE_URI = "http://android1.api.allinmd.cn:18080/services/";
 
 
