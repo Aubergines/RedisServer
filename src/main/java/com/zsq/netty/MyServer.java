@@ -18,9 +18,10 @@ public class MyServer {
 
 	public void run() throws Exception {
 		ServerBootstrap server = new ServerBootstrap();
-		NioEventLoopGroup group = new NioEventLoopGroup();
+		NioEventLoopGroup bossGroup  = new NioEventLoopGroup();
+		NioEventLoopGroup workGroup  = new NioEventLoopGroup();
 		try {
-			server.group(new NioEventLoopGroup(), new NioEventLoopGroup())
+			server.group(bossGroup, workGroup)
 					.channel(NioServerSocketChannel.class)
 					.localAddress(port)
 					.childHandler(new DispatcherServletChannelInitializer());
@@ -30,7 +31,8 @@ public class MyServer {
 			server.bind().sync().channel().closeFuture().sync();
 		}
 		finally {
-			group.shutdownGracefully();
+			bossGroup.shutdownGracefully();
+			workGroup.shutdownGracefully();
 		}
 	}
 
