@@ -19,7 +19,7 @@
         <constructor-arg>
             <list>
                 <bean class="redis.clients.jedis.JedisShardInfo">
-                    <constructor-arg name="host" value="115.28.87.77"/>
+                    <constructor-arg name="host" value="115.28.88.77"/>
                     <constructor-arg name="port" type="int" value="6379"/>
                     <property name="password" value="aubergine"/>
                 </bean>
@@ -34,7 +34,7 @@
     </bean>
     <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
         <constructor-arg index="0" ref="jedisPoolConfig"/>
-        <constructor-arg index="1" value="115.28.87.77"/>
+        <constructor-arg index="1" value="115.28.88.77"/>
         <constructor-arg index="2" value="6379" type="int"/>
         <constructor-arg index="3" value="300" type="int"/>
         <constructor-arg index="4" value="aubergine"/>
