@@ -36,7 +36,7 @@ public final class RedisPool {
 
     private static JedisPool jedisPool = null;
 
-    private static int DATA_BASE = 15;
+    private static int DATA_BASE = 0;
 
     /**
      * 初始化Redis连接池

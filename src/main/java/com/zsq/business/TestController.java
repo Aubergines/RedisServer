@@ -104,9 +104,9 @@ public class TestController {
     @RequestMapping(value="/get", produces = "application/json; charset=utf-8")
     public @ResponseBody String getJSON(HttpServletRequest request) {
         ShardedJedis resource = shardedJedisPool.getResource();
-        String s = resource.get("key:__rand_int__");
+        String s = resource.get("1397586886832");
         System.out.println(s);
-        return "OK";
+        return s;
     }
 
 }
