@@ -1,38 +1,28 @@
 package com.zsq.util;
 
 import redis.clients.jedis.BinaryClient.LIST_POSITION;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.*;
+import redis.clients.jedis.ZParams.Aggregate;
 
-import javax.annotation.Resource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
-public class GenericJedisDAOImpl {
+public class GenericJedis {
 
-	
-	@Resource
-	JedisPool jedisPool;
+	JedisPool jedisPool = null;
 
 	/*
 	 * @Resource(name = "sqlMapClientLog") SqlMapClient sqlMapClientLog;
-	 * 
+	 *
 	 * @PostConstruct public void setSqlMapClientBase() {
 	 * super.setSqlMapClient(sqlMapClientLog); }
 	 */
 
 	// 构造方法，根据实例类自动获取实体类类型
-	public GenericJedisDAOImpl() {
-
+	public GenericJedis(JedisPool jedisPool) {
+		jedisPool = jedisPool;
 	}
 
-	
 	/**
 	 * <p>
 	 * 通过key获取储存在redis中的value
@@ -40,7 +30,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 并释放连接
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return 成功返回value 失败返回null
 	 */
@@ -66,7 +56,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 如果key已经存在 则覆盖
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param value
 	 * @return 成功 返回OK 失败返回 0
@@ -89,7 +79,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 删除指定的key,也可以传入一个包含key的数组
 	 * </p>
-	 * 
+	 *
 	 * @param keys
 	 *            一个key 也可以使 string 数组
 	 * @return 返回删除成功的个数
@@ -112,7 +102,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key向指定的value值追加值
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param str
 	 * @return 成功返回 添加后value的长度 失败 返回 添加的 value 的长度 异常返回0L
@@ -137,7 +127,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 判断key是否存在
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return true OR false
 	 */
@@ -159,7 +149,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 设置key value,如果key已经存在则返回0,nx==> not exist
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param value
 	 * @return 成功返回1 如果存在 和 发生异常 返回 0
@@ -182,7 +172,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 设置key value并制定这个键值的有效期
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param value
 	 * @param seconds
@@ -229,7 +219,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * RES : bigsea.abc.cn
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param str
 	 * @param offset
@@ -254,7 +244,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过批量的key获取批量的value
 	 * </p>
-	 * 
+	 *
 	 * @param keys
 	 *            string数组 也可以是一个key
 	 * @return 成功返回value的集合, 失败返回null的集合 ,异常返回空
@@ -284,10 +274,10 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * obj.mset(new String[]{"key2","value1","key2","value2"})
 	 * </p>
-	 * 
+	 *
 	 * @param keysvalues
 	 * @return 成功返回OK 失败 异常 返回 null
-	 * 
+	 *
 	 */
 	public String mset(String... keysvalues) {
 		Jedis jedis = null;
@@ -314,7 +304,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * obj.msetnx(new String[]{"key2","value1","key2","value2"})
 	 * </p>
-	 * 
+	 *
 	 * @param keysvalues
 	 * @return 成功返回1 失败返回0
 	 */
@@ -337,7 +327,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 设置key的值,并返回一个旧值
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param value
 	 * @return 旧值 如果key不存在 则返回null
@@ -361,7 +351,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过下标 和key 获取指定下标位置的 value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param startOffset
 	 *            开始位置 从0 开始 负数表示从右边开始截取
@@ -387,7 +377,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key 对value进行加值+1操作,当value不是int类型时会返回错误,当key不存在是则value为1
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return 加值后的结果
 	 */
@@ -410,7 +400,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key给指定的value加值,如果key不存在,则这是value为该值
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param integer
 	 * @return
@@ -434,7 +424,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 对key的值做减减操作,如果key不存在,则设置key为-1
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -457,7 +447,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 减去指定的值
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param integer
 	 * @return
@@ -481,7 +471,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key获取value值的长度
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return 失败返回null
 	 */
@@ -504,7 +494,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key给field设置指定的值,如果key不存在,则先创建
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param field
 	 *            字段
@@ -530,7 +520,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key给field设置指定的值,如果key不存在则先创建,如果field已经存在,返回0
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param field
 	 * @param value
@@ -555,7 +545,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key同时设置 hash的多个field
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param hash
 	 * @return 返回OK 异常返回null
@@ -567,7 +557,7 @@ public class GenericJedisDAOImpl {
 			jedis = jedisPool.getResource();
 			res = jedis.hmset(key, hash);
 		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jedis);
+			// jedisPool.returnBrokenResource(jedis);
 			e.printStackTrace();
 		} finally {
 			returnResource(jedisPool, jedis);
@@ -579,7 +569,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key 和 field 获取指定的 value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param field
 	 * @return 没有返回null
@@ -603,7 +593,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key 和 fields 获取指定的value 如果没有对应的value则返回null
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param fields
 	 *            可以使 一个String 也可以是 String数组
@@ -628,7 +618,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key给指定的field的value加上给定的值
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param field
 	 * @param value
@@ -653,7 +643,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key和field判断是否有指定的value存在
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param field
 	 * @return
@@ -677,7 +667,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key返回field的数量
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -701,7 +691,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key 删除指定的 field
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param fields
 	 *            可以是 一个 field 也可以是 一个数组
@@ -726,7 +716,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key返回所有的field
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -749,7 +739,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key返回所有和key有关的value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -772,7 +762,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key获取所有的field和value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -795,7 +785,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key向list头部添加字符串
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param strs
 	 *            可以使一个string 也可以使string数组
@@ -820,7 +810,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key向list尾部添加字符串
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param strs
 	 *            可以使一个string 也可以使string数组
@@ -845,7 +835,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key在list指定的位置之前或者之后 添加字符串元素
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param where
 	 *            LIST_POSITION枚举类型
@@ -856,7 +846,7 @@ public class GenericJedisDAOImpl {
 	 * @return
 	 */
 	public Long linsert(String key, LIST_POSITION where, String pivot,
-			String value) {
+						String value) {
 		Jedis jedis = null;
 		Long res = null;
 		try {
@@ -878,7 +868,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 如果下标超过list里面value的个数则报错
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param index
 	 *            从0开始
@@ -904,7 +894,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key从对应的list中删除指定的count个 和 value相同的元素
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param count
 	 *            当count为0时删除全部
@@ -930,7 +920,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key保留list中从strat下标开始到end下标结束的value值
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param start
 	 * @param end
@@ -955,7 +945,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key从list的头部删除一个value,并返回该value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -978,7 +968,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key从list尾部删除一个value,并返回该元素
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -1004,7 +994,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 如果第一个list为空或者不存在则返回null
 	 * </p>
-	 * 
+	 *
 	 * @param srckey
 	 * @param dstkey
 	 * @return
@@ -1028,7 +1018,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key获取list中指定下标位置的value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param index
 	 * @return 如果没有返回null
@@ -1052,7 +1042,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key返回list的长度
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -1078,7 +1068,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 如果start 为 0 end 为 -1 则返回全部的list中的value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param start
 	 * @param end
@@ -1103,7 +1093,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key向指定的set中添加value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param members
 	 *            可以是一个String 也可以是一个String数组
@@ -1128,7 +1118,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key删除set中对应的value值
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param members
 	 *            可以是一个String 也可以是一个String数组
@@ -1153,7 +1143,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key随机删除一个set中的value并返回该值
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -1179,7 +1169,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 以第一个set为标准
 	 * </p>
-	 * 
+	 *
 	 * @param keys
 	 *            可以使一个string 则返回set中所有的value 也可以是string数组
 	 * @return
@@ -1206,7 +1196,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 以第一个set为标准
 	 * </p>
-	 * 
+	 *
 	 * @param dstkey
 	 *            差集存入的key
 	 * @param keys
@@ -1232,7 +1222,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key获取指定set中的交集
 	 * </p>
-	 * 
+	 *
 	 * @param keys
 	 *            可以使一个string 也可以是一个string数组
 	 * @return
@@ -1256,7 +1246,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key获取指定set中的交集 并将结果存入新的set中
 	 * </p>
-	 * 
+	 *
 	 * @param dstkey
 	 * @param keys
 	 *            可以使一个string 也可以是一个string数组
@@ -1281,7 +1271,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key返回所有set的并集
 	 * </p>
-	 * 
+	 *
 	 * @param keys
 	 *            可以使一个string 也可以是一个string数组
 	 * @return
@@ -1305,7 +1295,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key返回所有set的并集,并存入到新的set中
 	 * </p>
-	 * 
+	 *
 	 * @param dstkey
 	 * @param keys
 	 *            可以使一个string 也可以是一个string数组
@@ -1330,7 +1320,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key将set中的value移除并添加到第二个set中
 	 * </p>
-	 * 
+	 *
 	 * @param srckey
 	 *            需要移除的
 	 * @param dstkey
@@ -1358,7 +1348,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key获取set中value的个数
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -1381,7 +1371,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key判断value是否是set中的元素
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param member
 	 * @return
@@ -1405,7 +1395,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key获取set中随机的value,不删除元素
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -1428,7 +1418,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key获取set中所有的value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -1454,7 +1444,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 如果该value已经存在则根据score更新元素
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param scoreMembers
 	 * @return
@@ -1481,7 +1471,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 如果该value已经存在则根据score更新元素
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param score
 	 * @param member
@@ -1506,7 +1496,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key删除在zset中指定的value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param members
 	 *            可以使一个string 也可以是一个string数组
@@ -1531,7 +1521,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key增加该zset中value的score的值
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param score
 	 * @param member
@@ -1559,7 +1549,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 下标从小到大排序
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param member
 	 * @return
@@ -1586,7 +1576,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 下标从大到小排序
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param member
 	 * @return
@@ -1616,7 +1606,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 当start为0 end为-1时返回全部
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param start
 	 * @param end
@@ -1637,11 +1627,71 @@ public class GenericJedisDAOImpl {
 		return res;
 	}
 
+	public Set<Tuple> zrevrangeWithScores(String key, long start, long end) {
+		Jedis jedis = null;
+		Set<Tuple> res = null;
+		try {
+			jedis = jedisPool.getResource();
+			res = jedis.zrevrangeWithScores(key, start, end);
+		} catch (Exception e) {
+			jedisPool.returnBrokenResource(jedis);
+			e.printStackTrace();
+		} finally {
+			returnResource(jedisPool, jedis);
+		}
+		return res;
+	}
+
+	/**
+	 * <p>
+	 * 通过key将获取score从start到end中zset的value
+	 * </p>
+	 * <p>
+	 * socre从大到小排序
+	 * </p>
+	 * <p>
+	 * 当start为0 end为-1时返回全部
+	 * </p>
+	 *
+	 * @return
+	 */
+	public Long zunionstore(String dstkey, String... sets) {
+		Jedis jedis = null;
+		Long res = null;
+		try {
+			jedis = jedisPool.getResource();
+			res = jedis.zunionstore(dstkey, sets);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			returnResource(jedisPool, jedis);
+		}
+		return res;
+	}
+
+	public Long zunionstore_weights_sum(String destination, int[] weights,
+										String[] keys) {
+
+		Jedis jedis = null;
+		Long res = null;
+		try {
+			jedis = jedisPool.getResource();
+			res = jedis.zunionstore(destination, new ZParams().weights(weights)
+					.aggregate(Aggregate.SUM), keys);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			returnResource(jedisPool, jedis);
+		}
+		return res;
+
+	}
+
 	/**
 	 * <p>
 	 * 通过key返回指定score内zset中的value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param max
 	 * @param min
@@ -1654,7 +1704,6 @@ public class GenericJedisDAOImpl {
 			jedis = jedisPool.getResource();
 			res = jedis.zrevrangeByScore(key, max, min);
 		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jedis);
 			e.printStackTrace();
 		} finally {
 			returnResource(jedisPool, jedis);
@@ -1666,7 +1715,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key返回指定score内zset中的value
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param max
 	 * @param min
@@ -1691,7 +1740,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 返回指定区间内zset中value的数量
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param min
 	 * @param max
@@ -1716,7 +1765,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key返回zset中的value个数
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -1739,7 +1788,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key获取zset中value的score值
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param member
 	 * @return
@@ -1763,7 +1812,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key删除给定区间内的元素
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param start
 	 * @param end
@@ -1788,7 +1837,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key删除指定score内的元素
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @param start
 	 * @param end
@@ -1819,7 +1868,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 返回所有的key
 	 * </p>
-	 * 
+	 *
 	 * @param pattern
 	 * @return
 	 */
@@ -1830,7 +1879,7 @@ public class GenericJedisDAOImpl {
 			jedis = jedisPool.getResource();
 			res = jedis.keys(pattern);
 		} catch (Exception e) {
-			jedisPool.returnBrokenResource(jedis);
+			// jedisPool.returnBrokenResource(jedis);
 			e.printStackTrace();
 		} finally {
 			returnResource(jedisPool, jedis);
@@ -1842,7 +1891,7 @@ public class GenericJedisDAOImpl {
 	 * <p>
 	 * 通过key判断值得类型
 	 * </p>
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -1863,7 +1912,7 @@ public class GenericJedisDAOImpl {
 
 	/**
 	 * 返还到连接池
-	 * 
+	 *
 	 * @param jedisPool
 	 */
 	public static void returnResource(JedisPool jedisPool, Jedis jedis) {
@@ -1871,16 +1920,17 @@ public class GenericJedisDAOImpl {
 			jedisPool.returnResource(jedis);
 		}
 	}
-	
+
 	/**
 	 * 更新需要的字段列
-	 * 
+	 *
 	 * @param paramMap
 	 * @param key
 	 * @param field
 	 */
 	public void updateFieldValue(Map paramMap, String key, String field) {
 		String fieldString = StringTool.getMapString(paramMap, field);
+
 		if (fieldString.length() > 0) {
 
 			if (field.endsWith("Num")) {
@@ -1893,13 +1943,14 @@ public class GenericJedisDAOImpl {
 
 		}
 	}
-	
-	public String getKey(String redisPrefix, String uniquId) {
 
-		String returnString = redisPrefix + uniquId;
-
-		return returnString;
-	}
+	/*
+	 * public String getKey(String redisPrefix, String uniquId) {
+	 *
+	 * String returnString = redisPrefix + uniquId;
+	 *
+	 * return returnString; }
+	 */
 
 	// 序列化方法
 	public byte[] object2Bytes(Object value) {
@@ -1945,14 +1996,250 @@ public class GenericJedisDAOImpl {
 
 		return null;
 	}
-	
-	
-	
-	
 
-	public static void main(String[] args) throws Exception {
-		GenericJedisDAOImpl os = new GenericJedisDAOImpl();
-	//	os.testFile("test", "/opt/1397885502998_1397962546488.pdf");
+	/**
+	 * 组装redis hashmap
+	 *
+	 * @param paramMap
+	 *            数据map
+	 * @param
+	 * @return
+	 */
+	public Map getRedisMap(Map paramMap, Class clasz) {
+
+		//
+		String[] field_list = AnnotationUtils.getField(clasz);
+
+		Map redis_map = new HashMap();
+
+		for (String fieleName : field_list) {
+
+			System.out.println("fieleName=" + fieleName);
+			String fieleVlaue = "";
+
+			if (paramMap.get(fieleName) != null) {
+
+				fieleVlaue = (String) paramMap.get(fieleName).toString();
+
+				System.out.println("Redis debug fieleVlaue=" + fieleVlaue);
+
+			}
+
+			System.out.println("fieleVlaue=" + fieleName);
+
+			redis_map.put(fieleName, fieleVlaue);
+
+		}
+		return redis_map;
+	}
+	public Map deleteByKey(String redisPrefix, String id) {
+		BaseResponseObject responseObject = new BaseResponseObject();
+		responseObject.setResponseStatus(Boolean.FALSE);
+
+		try {
+
+			String key = redisPrefix + id;
+
+			System.out.println("Redis debug deleteByKey key =" + key);
+
+			Long del = this.del(key);
+
+			System.out.println("Redis debug deleteByKey=" + del);
+
+			responseObject.setResponseStatus(Boolean.TRUE);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return MapUtil.transBean2Map(responseObject);
+	}
+	public Map create(String redisPrefix, Map paramMap, Class clasz) {
+		BaseResponseObject responseObject = new BaseResponseObject();
+		responseObject.setResponseStatus(Boolean.FALSE);
+
+		try {
+
+			String id = StringTool.getMapString(paramMap, "id");
+
+			Boolean exist = exists(redisPrefix + id);
+
+			System.out.println("Redis debug exist=" + exist);
+
+			if (exist) {
+				// 删掉原来存在的值
+				this.deleteByKey(redisPrefix, id);
+			}
+
+			// 创建redis记录
+
+			Map redis_map = getRedisMap(paramMap, clasz);
+
+			String key = redisPrefix + id;
+
+			System.out.println("Redis debug key=" + key);
+			System.out.println("Redis debug redis_map=" + redis_map);
+
+			String s = hmset(key, redis_map);
+
+			responseObject.setResponseStatus(Boolean.TRUE);
+			responseObject.setResponseMessage(s);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return MapUtil.transBean2Map(responseObject);
+
 	}
 
+	public Map update(String redisPrefix, Map paramMap, Class clasz) {
+		BaseResponseObject responseObject = new BaseResponseObject();
+		responseObject.setResponseStatus(Boolean.FALSE);
+
+		try {
+
+			String topicId = StringTool.getMapString(paramMap, "topicId");
+
+			if (topicId.length() > 0) {
+
+				String key = redisPrefix + topicId;
+
+				Boolean exist = this.exists(key);
+
+				if (!exist) {
+					// 如果键值不存在，则从数据库同步当前数据到Redis
+					this.create(redisPrefix, paramMap, clasz);
+				}
+
+				// 更新redis记录
+
+				String[] field_list = AnnotationUtils.getField(clasz);
+
+				for (String fieleName : field_list) {
+					this.updateFieldValue(paramMap, key, fieleName);
+				}
+
+				responseObject.setResponseStatus(Boolean.TRUE);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return MapUtil.transBean2Map(responseObject);
+
+	}
+
+
+	public Map getMapList(String redisPrefix) {
+		BaseResponseObject responseObject = new BaseResponseObject(
+				Boolean.FALSE, "", "");
+		try {
+			List<Map> response_data_list = null;
+			Set<String> set = keys(redisPrefix + "*");
+			if (set != null && set.size() > 0) {
+				response_data_list = new ArrayList<Map>();
+				Iterator<String> i = set.iterator();
+				while (i.hasNext()) {
+					String keyStr = i.next();
+					Map m = hgetall(keyStr);
+					response_data_list.add(m);
+				}
+			}
+				Map responseData = new HashMap();
+				responseData.put("data_list", response_data_list);
+				int counts = response_data_list.size();
+				responseData.put("total_count", counts);
+				responseObject.setResponseData(responseData);
+				responseObject.setResponseStatus(Boolean.TRUE);
+
+
+		} catch (Exception ex) {
+			responseObject.setResponseStatus(Boolean.FALSE);
+			ex.printStackTrace();
+		}
+		return MapUtil.transBean2Map(responseObject);
+	}
+
+	public List getList(String redisPrefix) {
+		List<Map> response_data_list = null;
+		try {
+			Set<String> set = keys(redisPrefix + "*");
+			if (set != null && set.size() > 0) {
+				response_data_list = new ArrayList<Map>();
+				Iterator<String> i = set.iterator();
+				while (i.hasNext()) {
+					String keyStr = i.next();
+					Map m = hgetall(keyStr);
+					response_data_list.add(m);
+				}
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return response_data_list;
+	}
+	public List getSortList(String redisPrefix) {
+		List<Map> response_data_list = null;
+		try {
+			Jedis jedis = jedisPool.getResource();
+			SortingParams sortingParameters =  new  SortingParams();
+			sortingParameters.by("a:cb:*->customerId");
+			sortingParameters.limit(0, 10);
+			List<String> sort = jedis.sort("a:cb:*", sortingParameters);
+			System.out.println("==============" + sort);
+//
+//			Set<String> set = keys(redisPrefix + "*");
+//
+//
+//			if (set != null && set.size() > 0) {
+//				response_data_list = new ArrayList<Map>();
+//				Iterator<String> i = set.iterator();
+//				while (i.hasNext()) {
+//					String keyStr = i.next();
+//					Map m = hgetall(keyStr);
+//					response_data_list.add(m);
+//				}
+//			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return response_data_list;
+	}
+
+
+
+	public Map getMapById(String redisPrefix, String id) {
+		Map returnMap = null;
+		try {
+			String key = redisPrefix + id;
+			System.out.println("key=" + key);
+
+			returnMap = hgetall(key);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return returnMap;
+	}
+
+	public int getCount(String redisPrefix) {
+		int returnInt = 0;
+
+		try {
+
+			Set<String> set = keys(redisPrefix + "*");
+
+			if (set != null && set.size() > 0) {
+				returnInt = set.size();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return returnInt;
+	}
 }

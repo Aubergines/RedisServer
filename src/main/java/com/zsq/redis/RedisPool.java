@@ -11,13 +11,17 @@ import redis.clients.jedis.JedisPoolConfig;
 public final class RedisPool {
 
     //Redis服务器IP
-    private static String ADDR = "115.28.88.77";
+    private static String ADDR = "115.28.87.77";
+
+   // private static String ADDRALLIN = "192.168.1.126";
 
     //Redis的端口号
-    private static int PORT = 6379;
+    private static int PORT = 5379;
+//    private static int PORTALLIN = 6379;
 
     //访问密码
     private static String AUTH = "aubergine";
+//    private static String AUTHALLIN = "admin";
 
     //可用连接实例的最大数目，默认值为8；
     //如果赋值为-1，则表示不限制；如果pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)。
@@ -36,7 +40,7 @@ public final class RedisPool {
 
     private static JedisPool jedisPool = null;
 
-    private static int DATA_BASE = 0;
+    private static int DATA_BASE = 14;
 
     /**
      * 初始化Redis连接池
@@ -60,6 +64,7 @@ public final class RedisPool {
     public synchronized static JedisPool getJedis() {
         try {
             if (jedisPool != null) {
+                System.out.println(jedisPool);
                 return jedisPool;
             } else {
                 return null;
@@ -72,6 +77,7 @@ public final class RedisPool {
 
     public synchronized static Jedis getResource() {
         try {
+
             if (jedisPool != null) {
                 Jedis resource = jedisPool.getResource();
                 return resource;

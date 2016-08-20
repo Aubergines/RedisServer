@@ -22,4 +22,6 @@ public class Example {
 		System.out.println("miliSeconds:" + result.get(0) + ", partition:"
 				+ result.get(1) + ", seq:" + result.get(2));
 	}
+
+
 }

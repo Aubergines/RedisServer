@@ -14,7 +14,7 @@ public class IdGenerator {
 
 	static final Logger logger = LoggerFactory.getLogger(IdGenerator.class);
 	/**
-	 * JedisPool, luaSha
+	 * MyJedisPool, luaSha
 	 */
 	List<Pair<JedisPool, String>> jedisPoolList;
 	int retryTimes;

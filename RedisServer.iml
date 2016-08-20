@@ -18,7 +18,7 @@
       <sourceFolder url="file://$MODULE_DIR$/test/java" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="1.7" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: io.netty:netty-transport:4.0.23.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-buffer:4.0.23.Final" level="project" />
@@ -47,5 +47,6 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.6" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:1.7.7" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.2.4" level="project" />
+    <orderEntry type="library" name="basic_util-1.0.0" level="project" />
   </component>
 </module>

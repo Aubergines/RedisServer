@@ -3,19 +3,19 @@ package com.zsq.business;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.zsq.redis.JedisPool;
 import com.zsq.redis.RedisObject;
+import com.zsq.redis.RedisPool;
+import com.zsq.util.GenericJedis;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
-import redis.clients.jedis.ShardedJedis;
-import redis.clients.jedis.ShardedJedisPool;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -24,12 +24,7 @@ public class TestController {
 
 
     public static final String REST_SERVICE_URI = "http://127.0.0.1:8089/";
-    public static final String ALLINMD_SERVICE_URI = "http://192.168.1.10:18080/services/";
-
-
-    @Resource
-    ShardedJedisPool shardedJedisPool;
-
+    public static final String ALLINMD_SERVICE_URI = "http://192.168.1.32:18080/services/";
 
     @RequestMapping(value="/foo", produces = "application/json; charset=utf-8")
     public @ResponseBody String initCustomerData(HttpServletRequest request) {
@@ -94,18 +89,49 @@ public class TestController {
     }
     @RequestMapping(value="/get", produces = "application/json; charset=utf-8")
     public @ResponseBody String getJSON(HttpServletRequest request) {
-        ShardedJedis resource = shardedJedisPool.getResource();
-        String s = resource.get("1397586886832");
-        System.out.println(s);
-        return s;
+        for (int i = 0;i < 100; i++){
+            RedisObject.setValue(String.valueOf(i),System.currentTimeMillis());
+        }
+        return "OK";
     }
 
     @RequestMapping(value="/getJedis", produces = "application/json; charset=utf-8")
     public @ResponseBody String getJSONByJedis(HttpServletRequest request) {
-        JedisPool jedisPool = new JedisPool();
-        String s = jedisPool.getResource().get("1397586886832");
-        System.out.println(s);
-        return s;
+        System.out.println("=================");
+        return "=======================";
     }
 
+    @RequestMapping(value="/delete", produces = "application/json; charset=utf-8")
+    public @ResponseBody String deleteRedis(HttpServletRequest request) {
+        for (int i = 0;i < 100; i++){
+            RedisObject.deleteByKey(String.valueOf(i));
+        }
+        return "=======================";
+    }
+
+    @RequestMapping(value="/initProperty", produces = "application/json; charset=utf-8")
+    public @ResponseBody String InitProperty(HttpServletRequest request) {
+        GenericJedis genericJedis = new GenericJedis(RedisPool.getJedis());
+        RestTemplate restTemplate = new RestTemplate();
+        Map map = new HashMap();
+        map.put("propertyTypeId",1);
+        map.put("firstResult",0);
+        map.put("maxResult",100);
+        map.put("isValid",1);
+        Map paraMap = new HashMap();
+        paraMap.put("queryJson", JSON.toJSONString(map));
+//        ResponseEntity<Object[]> responseEntity = restTemplate.getForEntity(ALLINMD_SERVICE_URI + "comm/data/property/v2/getList", Object[].class,paraMap);
+//        Object[] objects = responseEntity.getBody();
+//        MediaType contentType = responseEntity.getHeaders().getContentType();
+//        HttpStatus statusCode = responseEntity.getStatusCode();
+//        System.out.println(JSON.toJSONString(objects));
+        Object[] str = restTemplate.getForObject(ALLINMD_SERVICE_URI + "comm/data/property/v2/getList", Object[].class,paraMap);
+        List searchList= Arrays.asList(str);
+        for (Object o : searchList) {
+            JSONObject jsonObject1 = JSONObject.parseObject(o.toString());
+            Object id = jsonObject1.get("id");
+            RedisObject.setValue("a:cdp:"+id.toString(),jsonObject1);
+        }
+        return "OK";
+    }
 }
