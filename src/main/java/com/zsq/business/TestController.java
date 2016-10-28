@@ -24,7 +24,25 @@ public class TestController {
 
 
     public static final String REST_SERVICE_URI = "http://127.0.0.1:8089/";
-    public static final String ALLINMD_SERVICE_URI = "http://192.168.1.32:18080/services/";
+    public static final String ALLINMD_SERVICE_URI = "http://192.168.1.174:18080/services/";
+
+    @RequestMapping(value="/topicList", produces = "application/json; charset=utf-8")
+    public @ResponseBody String getTopicList(HttpServletRequest request) {
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String,Object> paramMap = new HashMap<String,Object>();
+        paramMap.put("firstResult",0);
+        paramMap.put("maxResult",10);
+        String string = JSON.toJSONString(paramMap);
+        Map<String,String> queryMap = new HashMap<String,String>();
+        queryMap.put("queryJson",string);
+        System.out.println(string);
+//        ResponseEntity forEntity = restTemplate.getForEntity(ALLINMD_SERVICE_URI + "cms/topic/v2/getList?queryJson=" + string, CmsTopic.class);
+        List forObject = restTemplate.getForObject(ALLINMD_SERVICE_URI + "cms/topic/v2/getList?queryJson={'firstResult':{firstResult},'maxResult':{maxResult}}", List.class,paramMap);
+
+//        System.out.println(o);
+        return JSON.toJSONString(forObject);
+    }
+
 
     @RequestMapping(value="/foo", produces = "application/json; charset=utf-8")
     public @ResponseBody String initCustomerData(HttpServletRequest request) {
@@ -72,6 +90,7 @@ public class TestController {
         System.out.println(o);
         return JSON.toJSONString(forEntity);
     }
+
 
     @RequestMapping(value="/keyword", produces = "application/json; charset=utf-8")
     public @ResponseBody String getKeywordJSON(HttpServletRequest request) {
